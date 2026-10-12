@@ -10,7 +10,7 @@ This is that process.
 
 ## What it does
 
-Drop the slash command into your Claude Code project, run `/handoff-package <path-to-your-agent>`, and a multi-agent pipeline produces:
+Drop the slash command into your Claude Code project, run `/handoff-package <path-to-your-agent>`, and Claude produces (fanning out to sub-agents only when the source is big enough to need it):
 
 - **Cleaned source code** — your internal imports abstracted to local stubs, your env vars renamed, your hardcoded customer/account IDs replaced with placeholders
 - **Real documentation** — README, SETUP (deep platform setup steps), ARCHITECTURE, ROADMAP, HANDOFF_NOTES
@@ -22,7 +22,7 @@ Drop the slash command into your Claude Code project, run `/handoff-package <pat
 - **An air-tight scrub** for personal names, brand names, internal-ecosystem references, real account IDs, secrets — verified by an independent agent + your own greps
 - **Optional**: `gh repo create --private --push` for one-command GitHub publishing
 
-Roughly 60 minutes of agent time per bundle. Local-only by default — nothing pushed externally without your explicit OK.
+Roughly 15 minutes for a small script, up to an hour for a large agent. Local-only by default — nothing pushed externally without your explicit OK.
 
 ---
 
@@ -43,6 +43,8 @@ Or clone and copy:
 git clone https://github.com/matthew2rs/claude-agent-handoff.git
 cp claude-agent-handoff/commands/handoff-package.md /path/to/your/project/.claude/commands/
 ```
+
+To have it in every project instead, put it in `~/.claude/commands/` rather than the project's `.claude/commands/`.
 
 Restart Claude Code (or just open a new chat in the project). The slash command appears as `/handoff-package`.
 
@@ -68,8 +70,8 @@ Claude asks two scoping questions (source confirmation, bundle name), then runs 
 
 ## What it expects
 
-- **Python** — for the smoke test, requirements pinning, and round-trip steps. The slash command itself works for any language source, but the smoke-test + pinning steps are Python-specific.
-- **Claude Code with WebSearch + Workflow + standard tools** enabled.
+- **Python is the best-tested path** for the smoke test, pinning and round-trip steps. Other languages work too: the command falls back to that language's lockfile and clean install.
+- **Claude Code with WebSearch** and the standard tools. It uses the Workflow tool for the parallel steps if you have it, and plain sub-agents if you don't.
 - **`gh` CLI authenticated** (only for the optional GitHub push step — skippable).
 - A source agent that actually does something — the process is for production-shape tools, not 50-line throwaways.
 
@@ -89,7 +91,7 @@ Three rules hold this together:
 
 ## Reference build
 
-The pattern was distilled from packaging a funnel-aware paid-ads optimiser (production cron-driven Python agent across Google + Meta + Bing). End result: a 58-file, 808KB, MIT-licensed bundle with verified pinned requirements on Python 3.13. Built in one Claude Code session using exactly this slash command.
+The pattern was distilled from packaging a funnel-aware paid-ads optimiser (production cron-driven Python agent across Google + Meta + Bing). End result: a 58-file, 808KB, MIT-licensed bundle with verified pinned requirements on Python 3.13. Built in one Claude Code session using exactly this slash command. The command file includes the target folder layout.
 
 When in doubt about scope, length, or polish — match that bar.
 
